@@ -53,7 +53,7 @@ var signup = function(req, res) {
     var errorMessages = attributeErrors(attributes);
 
     if(errorMessages.length) {
-        res.status(400).text(errorMessages.join("\n"));
+        res.status(400).send(errorMessages.join("\n"));
 
         return;
     }

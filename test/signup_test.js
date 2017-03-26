@@ -26,7 +26,7 @@ describe("signup", function() {
                 this.lastStatus = code;
                 return this;
             },
-            text: function(text) {
+            send: function(text) {
                 this.lastText = text;
                 return this;
             },
