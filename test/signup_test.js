@@ -151,4 +151,28 @@ describe("signup", function() {
             expect(this.res.lastText).to.match(/email can't be blank/);
         });
     });
+
+    describe("with an amount < 5000", function() {
+        beforeEach(function() {
+            this.ranAt = (new Date()).valueOf();
+
+            this.ctx.body.firstname = "Rosa";
+            this.ctx.body.lastname = "Luxemburg " + this.ranAt.toString();
+            this.ctx.body.address1 = "123 Main St";
+            this.ctx.body.address2 = "Apt 7";
+            this.ctx.body.city = "Seattle";
+            this.ctx.body.state = "WA";
+            this.ctx.body.zip = "98102";
+            this.ctx.body.phone = "867-5309";
+            this.ctx.body.amount = "600";
+
+            this.ctx.secrets.successRedirect = "https://seattledsa.org";
+        });
+
+        it("returns a 400 with an error message", function() {
+            signup(this.ctx, this.req, this.res);
+            expect(this.res.lastStatus).to.eql(400);
+            expect(this.res.lastText).to.match(/amount must be >= \$50/);
+        });
+    });
 });
