@@ -14,7 +14,7 @@ describe("signup", function() {
             secrets: {
                 stripeSecretKey: process.env['STRIPE_SECRET_KEY']
             },
-            body:  {}
+            data:  {}
         };
 
         this.req = {};
@@ -39,23 +39,23 @@ describe("signup", function() {
         beforeEach(function(done) {
             this.ranAt = (new Date()).valueOf();
 
-            this.ctx.body.firstname = "Rosa";
-            this.ctx.body.lastname = "Luxemburg " + this.ranAt.toString();
-            this.ctx.body.address1 = "123 Main St";
-            this.ctx.body.address2 = "Apt 7";
-            this.ctx.body.city = "Seattle";
-            this.ctx.body.state = "WA";
-            this.ctx.body.zip = "98102";
-            this.ctx.body.phone = "867-5309";
-            this.ctx.body.amount = "7700";
-            this.ctx.body.email = "rosa.l@fake.email";
+            this.ctx.data.firstname = "Rosa";
+            this.ctx.data.lastname = "Luxemburg " + this.ranAt.toString();
+            this.ctx.data.address1 = "123 Main St";
+            this.ctx.data.address2 = "Apt 7";
+            this.ctx.data.city = "Seattle";
+            this.ctx.data.state = "WA";
+            this.ctx.data.zip = "98102";
+            this.ctx.data.phone = "867-5309";
+            this.ctx.data.amount = "7700";
+            this.ctx.data.email = "rosa.l@fake.email";
 
             this.ctx.secrets.successRedirect = "https://seattledsa.org";
 
             var _ctx = this.ctx;
 
             util.createStripeToken().then(function(stripeToken) {
-                _ctx.body.stripeToken = stripeToken.id;
+                _ctx.data.stripeToken = stripeToken.id;
 
                 done();
             });
@@ -129,15 +129,15 @@ describe("signup", function() {
         beforeEach(function() {
             this.ranAt = (new Date()).valueOf();
 
-            this.ctx.body.firstname = "Rosa";
-            this.ctx.body.lastname = "Luxemburg " + this.ranAt.toString();
-            this.ctx.body.address1 = "123 Main St";
-            this.ctx.body.address2 = "Apt 7";
-            this.ctx.body.city = "Seattle";
-            this.ctx.body.state = "WA";
-            this.ctx.body.zip = "98102";
-            this.ctx.body.phone = "867-5309";
-            this.ctx.body.amount = "7700";
+            this.ctx.data.firstname = "Rosa";
+            this.ctx.data.lastname = "Luxemburg " + this.ranAt.toString();
+            this.ctx.data.address1 = "123 Main St";
+            this.ctx.data.address2 = "Apt 7";
+            this.ctx.data.city = "Seattle";
+            this.ctx.data.state = "WA";
+            this.ctx.data.zip = "98102";
+            this.ctx.data.phone = "867-5309";
+            this.ctx.data.amount = "7700";
 
             this.ctx.secrets.successRedirect = "https://seattledsa.org";
 
@@ -156,15 +156,15 @@ describe("signup", function() {
         beforeEach(function() {
             this.ranAt = (new Date()).valueOf();
 
-            this.ctx.body.firstname = "Rosa";
-            this.ctx.body.lastname = "Luxemburg " + this.ranAt.toString();
-            this.ctx.body.address1 = "123 Main St";
-            this.ctx.body.address2 = "Apt 7";
-            this.ctx.body.city = "Seattle";
-            this.ctx.body.state = "WA";
-            this.ctx.body.zip = "98102";
-            this.ctx.body.phone = "867-5309";
-            this.ctx.body.amount = "600";
+            this.ctx.data.firstname = "Rosa";
+            this.ctx.data.lastname = "Luxemburg " + this.ranAt.toString();
+            this.ctx.data.address1 = "123 Main St";
+            this.ctx.data.address2 = "Apt 7";
+            this.ctx.data.city = "Seattle";
+            this.ctx.data.state = "WA";
+            this.ctx.data.zip = "98102";
+            this.ctx.data.phone = "867-5309";
+            this.ctx.data.amount = "600";
 
             this.ctx.secrets.successRedirect = "https://seattledsa.org";
         });

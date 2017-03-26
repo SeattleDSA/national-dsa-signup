@@ -34,7 +34,7 @@ module.exports = function (ctx, req, res) {
         'email',
         'stripeToken'
     ].forEach(function(attribute) {
-        attributes[attribute] = ctx.body[attribute];
+        attributes[attribute] = ctx.data[attribute];
     });
 
     var errorMessages = attributeErrors(attributes);
