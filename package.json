@@ -10,11 +10,10 @@
   "author": "dave",
   "license": "ISC",
   "dependencies": {
-    "babel-cli": "^6.24.0",
-    "lodash": "^4.17.4",
+    "lodash": "^3.10.1",
     "nock-vcr-recorder": "^0.1.5",
     "sinon": "^2.1.0",
-    "stripe": "^4.16.0"
+    "stripe": "^4.14.0"
   },
   "devDependencies": {
     "dotenv": "^4.0.0",

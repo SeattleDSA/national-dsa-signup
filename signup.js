@@ -4,7 +4,7 @@ var Stripe = require('stripe');
 var _ = require('lodash');
 
 var attributeErrors = function(attributes) {
-    return _.compact(_.map(_.entries(attributes), function(keyValuePair) {
+    return _.compact(_.map(_.pairs(attributes), function(keyValuePair) {
         var attr = keyValuePair[0];
         var value = keyValuePair[1];
 
