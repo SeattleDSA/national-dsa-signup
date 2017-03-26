@@ -9,7 +9,7 @@ var attributeErrors = function(attributes) {
         var value = keyValuePair[1];
 
         if(!value || !value.length) {
-            return "#{attr} can't be blank";
+            return attr + " can't be blank";
         } else {
             return null;
         }
