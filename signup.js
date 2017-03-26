@@ -11,8 +11,9 @@ if(process.env.NODE_ENV != 'test') {
 }
 
 var app = Express();
+var bodyParser = require('body-parser');
 
-app.use(require('body-parser').json());
+app.use(bodyParser.urlencoded())
 
 var attributeErrors = function(attributes) {
     return _.compact(_.map(_.pairs(attributes), function(keyValuePair) {
