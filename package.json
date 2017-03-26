@@ -1,0 +1,28 @@
+{
+  "name": "national-dsa-signup",
+  "version": "1.0.0",
+  "description": "",
+  "main": "signup.js",
+  "scripts": {
+    "test": "node_modules/mocha/bin/mocha",
+    "generateStripeToken": "node script/generateStripeToken.js"
+  },
+  "author": "dave",
+  "license": "ISC",
+  "dependencies": {
+    "babel-cli": "^6.24.0",
+    "lodash": "^4.17.4",
+    "nock-vcr-recorder": "^0.1.5",
+    "sinon": "^2.1.0",
+    "stripe": "^4.16.0"
+  },
+  "devDependencies": {
+    "dotenv": "^4.0.0",
+    "expect.js": "^0.3.1",
+    "jasmine": "^2.5.3",
+    "mocha": "^3.2.0",
+    "replay": "^2.1.2",
+    "sepia": "^2.0.2",
+    "sinon": "^2.1.0"
+  }
+}
