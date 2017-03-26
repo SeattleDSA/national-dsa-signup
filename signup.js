@@ -3,6 +3,17 @@
 var Stripe = require('stripe');
 var _ = require('lodash');
 
+
+var Express = require('express');
+
+if(process.env.NODE_ENV != 'test') {
+    var Webtask = require('webtask-tools');
+}
+
+var app = Express();
+
+app.use(require('body-parser').json());
+
 var attributeErrors = function(attributes) {
     return _.compact(_.map(_.pairs(attributes), function(keyValuePair) {
         var attr = keyValuePair[0];
@@ -18,7 +29,9 @@ var attributeErrors = function(attributes) {
     }));
 };
 
-module.exports = function (ctx, req, res) {
+var signup = function(req, res) {
+    var ctx = req.webtaskContext;
+
     var attributes = {};
 
     [
@@ -34,7 +47,7 @@ module.exports = function (ctx, req, res) {
         'email',
         'stripeToken'
     ].forEach(function(attribute) {
-        attributes[attribute] = ctx.data[attribute];
+        attributes[attribute] = req.body[attribute];
     });
 
     var errorMessages = attributeErrors(attributes);
@@ -85,3 +98,11 @@ module.exports = function (ctx, req, res) {
             res.status(400).text(error.message);
         });
 };
+
+app.post('/', signup);
+
+if(process.env.NODE_ENV != 'test') {
+    module.exports = Webtask.fromExpress(app);
+}
+
+module.exports.signup = signup;

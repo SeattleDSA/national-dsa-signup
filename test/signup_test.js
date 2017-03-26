@@ -1,6 +1,6 @@
 require('./test_helper');
 
-var signup = require('../signup');
+var signup = require('../signup').signup;
 var stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 var expect = require('expect.js');
 var _ = require('lodash');
@@ -10,14 +10,16 @@ describe("signup", function() {
     this.timeout(30000);
 
     beforeEach(function() {
-        this.ctx = {
-            secrets: {
-                stripeSecretKey: process.env['STRIPE_SECRET_KEY']
-            },
-            data:  {}
+        this.req = {
+            body: {},
+            webtaskContext: {
+                secrets: {
+                    stripeSecretKey: process.env['STRIPE_SECRET_KEY'],
+                    successRedirect: "https://seattledsa.org"
+                }
+            }
         };
 
-        this.req = {};
         this.res = {
             redirected: false,
             status: function(code) {
@@ -39,23 +41,21 @@ describe("signup", function() {
         beforeEach(function(done) {
             this.ranAt = (new Date()).valueOf();
 
-            this.ctx.data.firstname = "Rosa";
-            this.ctx.data.lastname = "Luxemburg " + this.ranAt.toString();
-            this.ctx.data.address1 = "123 Main St";
-            this.ctx.data.address2 = "Apt 7";
-            this.ctx.data.city = "Seattle";
-            this.ctx.data.state = "WA";
-            this.ctx.data.zip = "98102";
-            this.ctx.data.phone = "867-5309";
-            this.ctx.data.amount = "7700";
-            this.ctx.data.email = "rosa.l@fake.email";
+            this.req.body.firstname = "Rosa";
+            this.req.body.lastname = "Luxemburg " + this.ranAt.toString();
+            this.req.body.address1 = "123 Main St";
+            this.req.body.address2 = "Apt 7";
+            this.req.body.city = "Seattle";
+            this.req.body.state = "WA";
+            this.req.body.zip = "98102";
+            this.req.body.phone = "867-5309";
+            this.req.body.amount = "7700";
+            this.req.body.email = "rosa.l@fake.email";
 
-            this.ctx.secrets.successRedirect = "https://seattledsa.org";
-
-            var _ctx = this.ctx;
+            var _req = this.req;
 
             util.createStripeToken().then(function(stripeToken) {
-                _ctx.data.stripeToken = stripeToken.id;
+                _req.body.stripeToken = stripeToken.id;
 
                 done();
             });
@@ -64,7 +64,7 @@ describe("signup", function() {
         it("creates a stripe customer", function(done) {
             var _ranAt = this.ranAt;
 
-            signup(this.ctx, this.req, this.res)
+            signup(this.req, this.res)
                 .then(function() {
                     return stripe.customers.list();
                 })
@@ -95,7 +95,7 @@ describe("signup", function() {
         it("creates a stripe charge", function(done) {
             var _ranAt = this.ranAt;
 
-            signup(this.ctx, this.req, this.res)
+            signup(this.req, this.res)
                 .then(function() {
                     return stripe.charges.list();
                 })
@@ -113,7 +113,7 @@ describe("signup", function() {
 
         it("redirects to configured url", function(done) {
             var _res = this.res;
-            signup(this.ctx, this.req, _res)
+            signup(this.req, _res)
                 .then(function() {
                     expect(_res.redirected).to.eql(true);
                     expect(_res.lastRedirect).to.be("https://seattledsa.org");
@@ -129,23 +129,21 @@ describe("signup", function() {
         beforeEach(function() {
             this.ranAt = (new Date()).valueOf();
 
-            this.ctx.data.firstname = "Rosa";
-            this.ctx.data.lastname = "Luxemburg " + this.ranAt.toString();
-            this.ctx.data.address1 = "123 Main St";
-            this.ctx.data.address2 = "Apt 7";
-            this.ctx.data.city = "Seattle";
-            this.ctx.data.state = "WA";
-            this.ctx.data.zip = "98102";
-            this.ctx.data.phone = "867-5309";
-            this.ctx.data.amount = "7700";
-
-            this.ctx.secrets.successRedirect = "https://seattledsa.org";
+            this.req.body.firstname = "Rosa";
+            this.req.body.lastname = "Luxemburg " + this.ranAt.toString();
+            this.req.body.address1 = "123 Main St";
+            this.req.body.address2 = "Apt 7";
+            this.req.body.city = "Seattle";
+            this.req.body.state = "WA";
+            this.req.body.zip = "98102";
+            this.req.body.phone = "867-5309";
+            this.req.body.amount = "7700";
 
             // Missing stripeToken and email
         });
 
         it("returns a 400 with error messages", function() {
-            signup(this.ctx, this.req, this.res);
+            signup(this.req, this.res);
             expect(this.res.lastStatus).to.eql(400);
             expect(this.res.lastText).to.match(/stripeToken can't be blank/);
             expect(this.res.lastText).to.match(/email can't be blank/);
@@ -156,21 +154,19 @@ describe("signup", function() {
         beforeEach(function() {
             this.ranAt = (new Date()).valueOf();
 
-            this.ctx.data.firstname = "Rosa";
-            this.ctx.data.lastname = "Luxemburg " + this.ranAt.toString();
-            this.ctx.data.address1 = "123 Main St";
-            this.ctx.data.address2 = "Apt 7";
-            this.ctx.data.city = "Seattle";
-            this.ctx.data.state = "WA";
-            this.ctx.data.zip = "98102";
-            this.ctx.data.phone = "867-5309";
-            this.ctx.data.amount = "600";
-
-            this.ctx.secrets.successRedirect = "https://seattledsa.org";
+            this.req.body.firstname = "Rosa";
+            this.req.body.lastname = "Luxemburg " + this.ranAt.toString();
+            this.req.body.address1 = "123 Main St";
+            this.req.body.address2 = "Apt 7";
+            this.req.body.city = "Seattle";
+            this.req.body.state = "WA";
+            this.req.body.zip = "98102";
+            this.req.body.phone = "867-5309";
+            this.req.body.amount = "600";
         });
 
         it("returns a 400 with an error message", function() {
-            signup(this.ctx, this.req, this.res);
+            signup(this.req, this.res);
             expect(this.res.lastStatus).to.eql(400);
             expect(this.res.lastText).to.match(/amount must be >= \$50/);
         });
