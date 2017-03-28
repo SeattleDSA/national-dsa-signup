@@ -15,10 +15,25 @@ var bodyParser = require('body-parser');
 
 app.use(bodyParser.urlencoded())
 
+const REQUIRED = [
+    'firstname',
+    'lastname',
+    'address1',
+    'address2',
+    'city',
+    'state',
+    'zip',
+    'amount',
+    'email',
+    'stripeToken'
+]
+
 var attributeErrors = function(attributes) {
     return _.compact(_.map(_.pairs(attributes), function(keyValuePair) {
         var attr = keyValuePair[0];
         var value = keyValuePair[1];
+
+        if(!_.contains(REQUIRED, attr)) { return; }
 
         if(!value || !value.length) {
             return attr + " can't be blank";
