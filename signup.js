@@ -19,7 +19,6 @@ const REQUIRED = [
     'firstname',
     'lastname',
     'address1',
-    'address2',
     'city',
     'state',
     'zip',
