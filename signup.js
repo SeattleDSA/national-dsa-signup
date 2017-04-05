@@ -92,6 +92,10 @@ var signup = function(req, res) {
         phone: attributes.phone
     };
 
+    customerAttributes.metadata = {
+        nationalSignup: true
+    };
+
     var stripe = Stripe(ctx.secrets.stripeSecretKey);
 
     return stripe.customers.create(customerAttributes)
@@ -100,7 +104,10 @@ var signup = function(req, res) {
                 amount: attributes.amount,
                 currency: 'usd',
                 customer: customer.id,
-                description: attributes.firstname + " " + attributes.lastname
+                description: attributes.firstname + " " + attributes.lastname,
+                metadata: {
+                    nationalSignup: true
+                }
             });
         })
         .then(function(charge) {

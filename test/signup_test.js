@@ -101,6 +101,7 @@ describe("signup", function() {
                     expect(newCustomer.sources.data).to.be.ok();
                     expect(newCustomer.sources.data.length).to.be(1);
                     expect(newCustomer.sources.data[0].object).to.be("card");
+                    expect(newCustomer.metadata.nationalSignup).to.be("true");
 
                     done();
                 })
@@ -120,6 +121,7 @@ describe("signup", function() {
                     });
 
                     expect(newCharge).to.be.ok();
+                    expect(newCharge.metadata.nationalSignup).to.be("true");
 
                     done();
                 })
