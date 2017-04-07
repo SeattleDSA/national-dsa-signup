@@ -36,8 +36,8 @@ var attributeErrors = function(attributes) {
 
         if(!value || !value.length) {
             return attr + " can't be blank";
-        } else if((attr == "amount") && parseInt(value) < 5000) {
-            return "amount must be >= $50"
+        } else if((attr == "amount") && parseInt(value) < 4900) {
+            return "amount must be >= $49"
         } else {
             return null;
         }
