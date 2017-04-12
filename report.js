@@ -110,7 +110,12 @@ var fetchAllCharges = function(stripe, startTime, endTime) {
     });
 };
 
-var sendReport = function(slackApiKey, to, signups) {
+var sendReport = function(options) {
+    var slackApiKey = options.slackApiKey;
+    var to = options.to;
+    var additionalTo = options.additionalTo;
+    var signups = options.signups;
+
     var slack = new Slack(slackApiKey);
 
     if(signups && signups.length) {
@@ -143,6 +148,10 @@ var sendReport = function(slackApiKey, to, signups) {
                     createdAt];
         }));
 
+        if(additionalTo) {
+            slack.post(additionalTo, "We got " + signups.length + " National DSA Signups!");
+        }
+
         return new Promise(function(resolve, reject) {
             csvStringify(csvData, function(err, signupCsv) {
                 if(err) {
@@ -158,9 +167,15 @@ var sendReport = function(slackApiKey, to, signups) {
             });
         });
     } else {
-        to.split(",").forEach(function(handle) {
+        var promises = _.uniq((to + (additionalTo || "")).split(",").map(function(handle) {
             return slack.post(handle, "There were no new National DSA signups :-(");
-        });
+        }));
+
+        if(promises.length == 1) {
+            return promises[0];
+        } else {
+            return Promise.all(promises);
+        }
     }
 };
 
@@ -185,7 +200,14 @@ module.exports = function(ctx, cb) {
                 return charge.customer.deleted;
             });
         })
-        .then(function(signups) { return sendReport(ctx.secrets.slackApiKey, ctx.secrets.sendTo, signups); })
+        .then(function(signups) {
+            return sendReport({
+                slackApiKey: ctx.secrets.slackApiKey,
+                to: ctx.secrets.sendTo,
+                additionalTo: ctx.secrets.additionalTo,
+                signups: signups
+            });
+        })
         .then(function(resp) { return cb(null, resp); })
         .catch(cb);
 };
