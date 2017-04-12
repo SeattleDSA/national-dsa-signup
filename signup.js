@@ -116,7 +116,6 @@ var signup = function(req, res) {
             return charge;
         })
         .catch(function(error) {
-            console.log(error);
             res.status(400).text(error.message);
         });
 };

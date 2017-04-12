@@ -1,7 +1,7 @@
-require('./test_helper');
+var testHelper = require('./test_helper');
+var stripe = testHelper.stripe;
 
 var signup = require('../signup').signup;
-var stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 var expect = require('expect.js');
 var _ = require('lodash');
 var util = require('../util');
@@ -39,18 +39,7 @@ describe("signup", function() {
     });
 
     // TODO use replay or something similar so we don't have to do this
-    after(function(done) {
-        stripe.customers.list()
-            .then(function(customers) {
-                return Promise.all(
-                    _.filter(customers.data, { email: "rosa.l@fake.email" }).map(function(customer) {
-                        return stripe.customers.del(customer.id);
-                    })
-                );
-            })
-            .then(function() { done(); })
-            .catch(done);
-    });
+    after(testHelper.cleanupStripe.bind(testHelper));
 
     describe("on success", function() {
         beforeEach(function(done) {
