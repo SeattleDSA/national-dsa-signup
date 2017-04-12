@@ -168,7 +168,7 @@ module.exports = function(ctx, cb) {
     var stripe = Stripe(ctx.secrets.stripeSecretKey);
 
     if(ctx.secrets.startTime) {
-        var startTime = moment(ctx.secrets.startTime);
+        var startTime = moment(ctx.secrets.startTime).unix();
     } else {
         var startTime = moment().subtract(1, "day").hours(0).minutes(0).seconds(0).unix();
     }
