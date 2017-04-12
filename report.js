@@ -2,8 +2,70 @@ var Stripe = require("stripe");
 var _ = require("lodash");
 var Promise = require("bluebird");
 var moment = require("moment");
-var Slack = require("./lib/slack");
 var csvStringify = require("csv-stringify");
+
+////////////////////////////////////////////////////////////////////////////////
+// Slack client
+//  (webtask.io doesn't support relative requires, and the slack package wasn't
+//   supported as of the last time i checked)
+////////////////////////////////////////////////////////////////////////////////
+
+var request = require("request");
+
+var doRequest = function(requestOptions) {
+    return new Promise(function(resolve, reject) {
+        var req = request(requestOptions, function(err, _res, body) {
+            if(err) {
+                reject(err);
+            } else {
+                resolve(body);
+            }
+        });
+    });
+};
+
+var Slack = function (apiKey) {
+    this.apiKey = apiKey;
+};
+
+Slack.prototype._requestOptions = function(endpoint, data) {
+    var options = {
+        url: "https://api.slack.com" + endpoint,
+        method: 'POST',
+        form: _.defaults({ token: this.apiKey, as_user: true }, data)
+    };
+
+    return options;
+};
+
+Slack.prototype.post = function(to, message) {
+    var postData = {
+        channel: to,
+        text: message
+    };
+
+    var requestOptions = this._requestOptions("/api/chat.postMessage", postData);
+
+    return doRequest(requestOptions);
+};
+
+Slack.prototype.upload = function(to, initialComment, contents) {
+    var postData = {
+        channels: to,
+        initial_comment: initialComment,
+        content: contents,
+        filename: "signups.csv"
+    };
+
+    var requestOptions = this._requestOptions("/api/files.upload", postData);
+
+    return doRequest(requestOptions);
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+
+
 
 var fetchPageOfCharges = function(stripe, startTime, endTime, startAfter) {
     var opts = {
