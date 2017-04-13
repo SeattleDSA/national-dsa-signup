@@ -125,13 +125,17 @@ var sendReport = function(options) {
                        "City",
                        "State",
                        "Zip",
+                       "Email",
+                       "Phone",
                        "Full Amount",
                        "Half Amount",
                        "Signed up at"];
 
         var csvData = [headers].concat(signups.map(function(signup) {
             var name = signup.customer.shipping.name;
+            var phone = signup.customer.shipping.phone;
             var address = signup.customer.shipping.address;
+            var email = signup.customer.email;
 
             var fullAmount = signup.amount / 100;
             var halfAmount = fullAmount / 2;
@@ -143,6 +147,8 @@ var sendReport = function(options) {
                     address.city,
                     address.state,
                     address.postal_code,
+                    email,
+                    phone,
                     fullAmount,
                     halfAmount,
                     createdAt];
