@@ -156,7 +156,7 @@ describe("signup", function() {
         });
     });
 
-    describe("with an amount < 4500", function() {
+    describe("with an amount < 1900", function() {
         beforeEach(function() {
             this.ranAt = (new Date()).valueOf();
 
@@ -174,7 +174,7 @@ describe("signup", function() {
         it("returns a 400 with an error message", function() {
             signup(this.req, this.res);
             expect(this.res.lastStatus).to.eql(400);
-            expect(this.res.lastText).to.match(/amount must be >= \$45/);
+            expect(this.res.lastText).to.match(/amount must be >= \$19/);
         });
     });
 });
