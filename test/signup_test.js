@@ -91,6 +91,7 @@ describe("signup", function() {
                     expect(newCustomer.sources.data.length).to.be(1);
                     expect(newCustomer.sources.data[0].object).to.be("card");
                     expect(newCustomer.metadata.nationalSignup).to.be("true");
+                    expect(newCustomer.metadata.donation).to.be(undefined);
 
                     done();
                 })
