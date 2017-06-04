@@ -58,6 +58,7 @@ var donate = function(req, res) {
         'phone',
         'amount',
         'email',
+        'monthly',
         'stripeToken'
     ].forEach(function(attribute) {
         attributes[attribute] = req.body[attribute];
@@ -95,18 +96,30 @@ var donate = function(req, res) {
     };
 
     var stripe = Stripe(ctx.secrets.stripeSecretKey);
+    var isMonthly = (attributes.monthly == "true");
 
     return stripe.customers.create(customerAttributes)
         .then(function(customer) {
-            return stripe.charges.create({
-                amount: attributes.amount,
-                currency: 'usd',
-                customer: customer.id,
-                description: attributes.firstname + " " + attributes.lastname,
-                metadata: {
-                    donation: true
-                }
-            });
+            if(isMonthly) {
+                return stripe.subscriptions.create({
+                    plan: "monthly-donation",
+                    customer: customer.id,
+                    quantity: parseInt(attributes.amount) / 100,
+                    metadata: {
+                        donation: true
+                    }
+                });
+            } else {
+                return stripe.charges.create({
+                    amount: attributes.amount,
+                    currency: 'usd',
+                    customer: customer.id,
+                    description: attributes.firstname + " " + attributes.lastname,
+                    metadata: {
+                        donation: true
+                    }
+                });
+            }
         })
         .then(function(charge) {
             res.redirect(ctx.secrets.successRedirect);

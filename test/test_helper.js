@@ -16,6 +16,16 @@ module.exports = {
                     })
                 );
             })
+            .then(function() {
+                return stripe.subscriptions.list();
+            })
+            .then(function(subscriptions) {
+                return Promise.all(
+                    subscriptions.data.map(function(subscription) {
+                        return stripe.subscriptions.del(subscription.id);
+                    })
+                );
+            })
             .then(function() { done(); })
             .catch(done);
     },

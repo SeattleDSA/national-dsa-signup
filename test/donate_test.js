@@ -118,6 +118,29 @@ describe("donate", function() {
                 .catch(done);
         });
 
+        it("creates a stripe subscription", function(done) {
+            var _ranAt = this.ranAt;
+
+            this.req.body.monthly = "true";
+
+            donate(this.req, this.res)
+                .then(function() {
+                    return stripe.subscriptions.list();
+                })
+                .then(function(subscriptions) {
+                    var newSubscription = _.find(_.filter(subscriptions.data, { quantity: 77 }), function(charge) {
+                        return charge.created >= _ranAt / 1000;
+                    });
+
+                    expect(newSubscription).to.be.ok();
+                    expect(newSubscription.plan.id).to.be("monthly-donation");
+                    expect(newSubscription.metadata.donation).to.be("true");
+
+                    done();
+                })
+                .catch(done);
+        });
+
         it("redirects to configured url", function(done) {
             var _res = this.res;
             donate(this.req, _res)
