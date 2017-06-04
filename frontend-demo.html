@@ -1,135 +1,257 @@
 <html lang="en">
-    <head>
-        <script
-            src="https://code.jquery.com/jquery-3.2.1.min.js"
-            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-            crossorigin="anonymous"></script>
-        <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
-        <script type="text/javascript">
+  <head>
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.min.js"
+      integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+      crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+    <script type="text/javascript">
 
-         // Use the pk_live_* key when this goes live
-         Stripe.setPublishableKey('pk_test_we9VIsOMjJO1JVMjIhu66bVV');
+      // Use the pk_live_* key when this goes live
+      Stripe.setPublishableKey('pk_test_we9VIsOMjJO1JVMjIhu66bVV');
 
-         var stripeResponseHandler = function(response, tokenObject) {
-             var $form = $('#payment-form');
+      var stripeResponseHandler = function($form) {
+        return function(response, tokenObject) {
+          if (tokenObject.error) { // Problem!
+            // Show the errors on the form
+            $form.find('.payment-errors').html(tokenObject.error.message);
+            $form.find('button').prop('disabled', false); // Re-enable submission
+          } else { // Token was created!
 
-             if (tokenObject.error) { // Problem!
-                 // Show the errors on the form
-                 $form.find('.payment-errors').html(tokenObject.error.message);
-                 $form.find('button').prop('disabled', false); // Re-enable submission
-             } else { // Token was created!
+            // Get the token ID:
+            var token = tokenObject.id;
 
-                 // Get the token ID:
-                 var token = tokenObject.id;
+            // Insert the token into the form so it gets submitted to the server:
+            $form.append($('<input type="hidden" name="stripeToken" />').val(token));
 
-                 // Insert the token into the form so it gets submitted to the server:
-                 $form.append($('<input type="hidden" name="stripeToken" />').val(token));
+            // Submit the form:
+            $form.get(0).submit();
+          }
+        };
+      };
 
-                 // Submit the form:
-                 $form.get(0).submit();
-             }
-         };
+      $(function(){
+        $("button[data-stripe-submit]").click(function(){
+          $(this).prop('disabled', true);
+          var $form = $(this).parents('form');
 
-         $(function(){
-             $("button[data-stripe-submit]").click(function(){
-                 $(this).prop('disabled', true);
+          Stripe.card.createToken({
+            number: $form.find('[data-card-number]').val(),
+            cvc: $form.find('[data-card-cvc]').val(),
+            exp_month: $form.find('[data-card-expiry-month]').val(),
+            exp_year: $form.find('[data-card-expiry-year]').val()
+          }, stripeResponseHandler($form));
+        });
 
-                 Stripe.card.createToken({
-                     number: $('[data-card-number]').val(),
-                     cvc: $('[data-card-cvc]').val(),
-                     exp_month: $('[data-card-expiry-month]').val(),
-                     exp_year: $('[data-card-expiry-year]').val()
-                 }, stripeResponseHandler);
-             });
-         });
-        </script>
+        // From here down is simply for showing/hiding the signup or donate forms.
+        $("a[data-show]").click(function(e) {
+          e.preventDefault();
+          var show = $(this).data("show");
 
-        <style>
-         label { display: block; }
-        </style>
-    </head>
-    <body>
-        <!-- form action should have the live url when this goes live -->
-        <form method="post" action="https://wt-64417167ba0995031dff46dd4e6aafa1-0.run.webtask.io/sdsa-national-dsa-signup-test" id="payment-form">
-            <div class="payment-errors"></div>
-            <label>
-                Email
-                <input type="email" name="email" required />
-            </label>
-            <label>
-                Phone
-                <input type="phone" name="phone" />
-            </label>
-            <label>
-                First Name
-                <input type="text" name="firstname" required />
-            </label>
-            <label>
-                Last Name
-                <input type="text" name="lastname" required />
-            </label>
-            <label>
-                Address 1
-                <input type="text" name="address1" required />
-            </label>
-            <label>
-                Address 2
-                <input type="text" name="address2" />
-            </label>
-            <label>
-                City
-                <input type="text" name="city" required />
-            </label>
-            <label>
-                State
-                <input type="text" name="state" required />
-            </label>
-           <label>
-                Zip
-                <input type="text" name="zip" required />
-            </label>
-            <label>
-                <!--
-                amount is in cents (5000 = $50)
-                The backend will accept any value >= 5000
-                   -->
-                Amount
-                <select name="amount">
-                    <option value="5000">$50   [member]</option>
-                    <option value="10000">$100 [super commie]</option>
-                    <option value="20000">$200 [ultra commie]</option>
-                </select>
-            </label>
-            <div>
-                <pre>
-                ** In test mode, use the test credit card 4242 4242 4242 4242
-                   with any security code and future expiration
-                </pre>
-            </div>
-            <label>
-                Credit Card Number
-                <!-- VERY importatnt that these have the data-* fields and not a name attribute -->
-                <input type="text" data-card-number required />
-            </label>
-            <label>
-                Card Security Code
-                <!-- VERY importatnt that these have the data-* fields and not a name attribute -->
-                <input type="text" data-card-cvc size="3" required />
-            </label>
-            <label>
-                Exp Month
-                <!-- VERY importatnt that these have the data-* fields and not a name attribute -->
-                <input type="text" data-card-expiry-month size="2" required />
-            </label>
-            <label>
-                Exp Year
-                <!-- VERY importatnt that these have the data-* fields and not a name attribute -->
-                <input type="text" data-card-expiry-year size="2" required />
-            </label>
+          if(show == "signup") {
+            $("#signup-form").show();
+            $("#donate-form").hide();
+          } else {
+            $("#signup-form").hide();
+            $("#donate-form").show();
+          }
+        });
 
-            <button type="button" data-stripe-submit="true">
-                Do it
-            </button>
-        </form>
-    </body>
+        $("a[data-show=signup]").click();
+      });
+    </script>
+
+    <style>
+      label { display: block; }
+    </style>
+  </head>
+  <body>
+    <ul>
+      <li>
+        <a data-show="signup" href="">Signup</a>
+      </li>
+      <li>
+        <a data-show="donate" href="">Donate</a>
+      </li>
+    </ul>
+
+    <!-- form action should have the live url when this goes live -->
+    <form method="post" action="https://wt-64417167ba0995031dff46dd4e6aafa1-0.run.webtask.io/national-dsa-signup-test" id="signup-form">
+      <h1>Signup</h1>
+      <div class="payment-errors"></div>
+      <label>
+        Email
+        <input type="email" name="email" required />
+      </label>
+      <label>
+        Phone
+        <input type="phone" name="phone" />
+      </label>
+      <label>
+        First Name
+        <input type="text" name="firstname" required />
+      </label>
+      <label>
+        Last Name
+        <input type="text" name="lastname" required />
+      </label>
+      <label>
+        Address 1
+        <input type="text" name="address1" required />
+      </label>
+      <label>
+        Address 2
+        <input type="text" name="address2" />
+      </label>
+      <label>
+        City
+        <input type="text" name="city" required />
+      </label>
+      <label>
+        State
+        <input type="text" name="state" required />
+      </label>
+      <label>
+        Zip
+        <input type="text" name="zip" required />
+      </label>
+      <label>
+        <!--
+            amount is in cents (5000 = $50)
+            The backend will accept any value >= 5000
+          -->
+        Amount
+        <select name="amount">
+          <option value="5000">$50   [member]</option>
+          <option value="10000">$100 [super commie]</option>
+          <option value="20000">$200 [ultra commie]</option>
+        </select>
+      </label>
+      <div>
+        <pre>
+          ** In test mode, use the test credit card 4242 4242 4242 4242
+          with any security code and future expiration
+        </pre>
+      </div>
+      <label>
+        Credit Card Number
+        <!-- VERY importatnt that these have the data-* fields and not a name attribute -->
+        <input type="text" data-card-number required />
+      </label>
+      <label>
+        Card Security Code
+        <!-- VERY importatnt that these have the data-* fields and not a name attribute -->
+        <input type="text" data-card-cvc size="3" required />
+      </label>
+      <label>
+        Exp Month
+        <!-- VERY importatnt that these have the data-* fields and not a name attribute -->
+        <input type="text" data-card-expiry-month size="2" required />
+      </label>
+      <label>
+        Exp Year
+        <!-- VERY importatnt that these have the data-* fields and not a name attribute -->
+        <input type="text" data-card-expiry-year size="2" required />
+      </label>
+
+      <button type="button" data-stripe-submit="true">
+        Signup
+      </button>
+    </form>
+
+
+    <!-- form action should have the live url when this goes live -->
+    <form method="post" action="https://wt-64417167ba0995031dff46dd4e6aafa1-0.run.webtask.io/national-dsa-donate-test" id="donate-form">
+      <h1>Donate</h1>
+      <div class="payment-errors"></div>
+      <label>
+        Email
+        <input type="email" name="email" required />
+      </label>
+      <label>
+        Phone
+        <input type="phone" name="phone" />
+      </label>
+      <label>
+        First Name
+        <input type="text" name="firstname" required />
+      </label>
+      <label>
+        Last Name
+        <input type="text" name="lastname" required />
+      </label>
+      <label>
+        Address 1
+        <input type="text" name="address1" required />
+      </label>
+      <label>
+        Address 2
+        <input type="text" name="address2" />
+      </label>
+      <label>
+        City
+        <input type="text" name="city" required />
+      </label>
+      <label>
+        State
+        <input type="text" name="state" required />
+      </label>
+      <label>
+        Zip
+        <input type="text" name="zip" required />
+      </label>
+      <label>
+        <!--
+            amount is in cents (5000 = $50)
+            The backend will accept any value >= 5000
+          -->
+        Amount
+        <select name="amount">
+          <option value="5000">$50   [member]</option>
+          <option value="10000">$100 [super commie]</option>
+          <option value="20000">$200 [ultra commie]</option>
+        </select>
+      </label>
+      <div>
+        <pre>
+          ** In test mode, use the test credit card 4242 4242 4242 4242
+          with any security code and future expiration
+        </pre>
+      </div>
+      <label>
+        Credit Card Number
+        <!-- VERY importatnt that these have the data-* fields and not a name attribute -->
+        <input type="text" data-card-number required />
+      </label>
+      <label>
+        Card Security Code
+        <!-- VERY importatnt that these have the data-* fields and not a name attribute -->
+        <input type="text" data-card-cvc size="3" required />
+      </label>
+      <label>
+        Exp Month
+        <!-- VERY importatnt that these have the data-* fields and not a name attribute -->
+        <input type="text" data-card-expiry-month size="2" required />
+      </label>
+      <label>
+        Exp Year
+        <!-- VERY importatnt that these have the data-* fields and not a name attribute -->
+        <input type="text" data-card-expiry-year size="2" required />
+      </label>
+
+      <label>
+        <input type="radio" name="monthly" value="" id="monthly_or_one_time" checked="checked" />
+        One Time
+      </label>
+      <label>
+        <input type="radio" name="monthly" value="true" id="monthly_or_one_time" />
+        Monthly
+      </label>
+
+      <button type="button" data-stripe-submit="true">
+        Donate
+      </button>
+    </form>
+
+  </body>
 </html>
