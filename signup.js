@@ -120,8 +120,7 @@ var signup = function(req, res) {
         });
 };
 
-app.post('/', signup); // For legacy
-app.post('/signup', signup);
+app.post('/', signup);
 
 if(process.env.NODE_ENV != 'test') {
     module.exports = Webtask.fromExpress(app);

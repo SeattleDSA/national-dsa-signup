@@ -131,7 +131,7 @@ var donate = function(req, res) {
         });
 };
 
-app.post('/donate', donate);
+app.post('/', donate);
 
 if(process.env.NODE_ENV != 'test') {
     module.exports = Webtask.fromExpress(app);
