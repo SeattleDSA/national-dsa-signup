@@ -5,7 +5,8 @@
   "main": "signup.js",
   "scripts": {
     "test": "node_modules/mocha/bin/mocha",
-    "generateStripeToken": "node script/generateStripeToken.js"
+    "generateStripeToken": "node script/generateStripeToken.js",
+    "app": "node ./app.js"
   },
   "author": "dave",
   "license": "ISC",
@@ -15,6 +16,7 @@
     "express": "^4.14.0",
     "lodash": "^3.10.1",
     "moment": "^2.11.2",
+    "morgan": "^1.8.2",
     "nock-vcr-recorder": "^0.1.5",
     "request": "^2.81.0",
     "sinon": "^2.1.0",
