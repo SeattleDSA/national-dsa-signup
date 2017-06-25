@@ -1,7 +1,7 @@
 var testHelper = require('./test_helper');
 var stripe = testHelper.stripe;
 
-var signup = require('../signup').signup;
+var signup = require('../signup');
 var expect = require('expect.js');
 var _ = require('lodash');
 var util = require('../util');
@@ -13,12 +13,6 @@ describe("signup", function() {
     beforeEach(function() {
         this.req = {
             body: {},
-            webtaskContext: {
-                secrets: {
-                    stripeSecretKey: process.env['STRIPE_SECRET_KEY'],
-                    successRedirect: "https://seattledsa.org"
-                }
-            }
         };
 
         this.res = {
@@ -123,7 +117,7 @@ describe("signup", function() {
             signup(this.req, _res)
                 .then(function() {
                     expect(_res.redirected).to.eql(true);
-                    expect(_res.lastRedirect).to.be("https://seattledsa.org");
+                    expect(_res.lastRedirect).to.be("https://seattledsa.org/thanks");
                     done();
                 })
                 .catch(done);

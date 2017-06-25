@@ -1,7 +1,7 @@
 var testHelper = require('./test_helper');
 var stripe = testHelper.stripe;
 
-var donate = require('../donate').donate;
+var donate = require('../donate');
 var expect = require('expect.js');
 var _ = require('lodash');
 var util = require('../util');
@@ -12,13 +12,7 @@ describe("donate", function() {
 
     beforeEach(function() {
         this.req = {
-            body: {},
-            webtaskContext: {
-                secrets: {
-                    stripeSecretKey: process.env['STRIPE_SECRET_KEY'],
-                    successRedirect: "https://seattledsa.org"
-                }
-            }
+            body: {}
         };
 
         this.res = {
@@ -146,7 +140,7 @@ describe("donate", function() {
             donate(this.req, _res)
                 .then(function() {
                     expect(_res.redirected).to.eql(true);
-                    expect(_res.lastRedirect).to.be("https://seattledsa.org");
+                    expect(_res.lastRedirect).to.be("https://seattledsa.org/thanks");
                     done();
                 })
                 .catch(done);

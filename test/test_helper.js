@@ -30,7 +30,7 @@ module.exports = {
             .catch(done);
     },
     createSignup: function() {
-        var signup = require("../signup").signup;
+        var signup = require("../signup");
 
         var ranAt = (new Date()).valueOf();
 
