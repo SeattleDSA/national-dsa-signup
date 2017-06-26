@@ -116,6 +116,6 @@ module.exports = function(req, res) {
       return charge;
     })
     .catch(function(error) {
-      res.status(400).text(error.message);
+      res.status(400).send(error.message);
     });
 };
