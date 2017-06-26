@@ -32,6 +32,7 @@ module.exports = function (shipit) {
   shipit.on("deployed", function() {
     shipit.start("fix-permissions");
     shipit.start("npm-install");
+    shipit.start("copy-dotenv");
     shipit.start("restart-server");
   });
 
@@ -45,5 +46,9 @@ module.exports = function (shipit) {
 
   shipit.task("restart-server", function() {
     runAsDeployUser("cd " + current + " && node_modules/pm2/bin/pm2 restart app.js");
+  });
+
+  shipit.task("copy-dotenv", function() {
+    runAsDeployUser("cp " + process.env.DOTENV_PATH + " " + process.env.DEPLOY_TO + "/current");
   });
 };
